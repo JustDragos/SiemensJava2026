@@ -12,7 +12,7 @@ Proiect_java/.idea/libraries/
 *.iws
 *.iml
 *.ipr
-
+*.idea/
 
 ### Eclipse ###
 .apt_generated
