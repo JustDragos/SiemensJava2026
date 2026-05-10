@@ -46,8 +46,6 @@ public class MatchmakingController {
     }
 }
 
-```
-
 ## Why This Solution is Effective
 
 * **Zero CPU Overhead:** Threads are suspended while waiting, eliminating the cost of polling.

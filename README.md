@@ -11,31 +11,31 @@ Used Java version 23
 
 ## Client Options
 
-![Overview](Proiect_java/photos/image.png)
+![Overview](photos/image.png)
 
-![Routes & Trains](Proiect_java/photos/image-1.png)
+![Routes & Trains](photos/image-1.png)
 
 
-![Book Tickets](Proiect_java/photos/image-2.png)
+![Book Tickets](photos/image-2.png)
 
 # Used Mail Trap for the email service
 I needed a domain that I do not have to use a real email service. I do not have a device that runs non-stop to host my own dns server.
-![Email Confirmation](Proiect_java/photos/image-3.png)
+![Email Confirmation](photos/image-3.png)
 
 
 ## Admin Options
-![Add stations menu](Proiect_java/photos/image-4.png)
+![Add stations menu](photos/image-4.png)
 
 
-![Route Manager](Proiect_java/photos/image-5.png)
+![Route Manager](photos/image-5.png)
 
-![Train Viewer](Proiect_java/photos/image-6.png)
+![Train Viewer](photos/image-6.png)
 
-![Booking Viewer](Proiect_java/photos/image-7.png)
+![Booking Viewer](photos/image-7.png)
 
-![Delay Manager](Proiect_java/photos/image-11.png)
+![Delay Manager](photos/image-11.png)
 
-![Delay Effect](Proiect_java/photos/image-9.png)
+![Delay Effect](photos/image-9.png)
 every passanger was notified of it
-![Email Notifier](Proiect_java/photos/image-10.png)
+![Email Notifier](photos/image-10.png)
 
