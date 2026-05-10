@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrainTicket System</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  :root {
+    --bg1:#ffffff;--bg2:#f5f5f4;--bg3:#eeece8;
+    --warn-bg:#faeeda;--ok-bg:#eaf3de;--err-bg:#fcebeb;--info-bg:#e6f1fb;
+    --tx1:#1a1a18;--tx2:#5f5e5a;--tx3:#888780;
+    --warn:#854f0b;--ok:#3b6d11;--err:#a32d2d;--info:#185fa5;
+    --b3:rgba(0,0,0,0.12);--b2:rgba(0,0,0,0.22);--b1:rgba(0,0,0,0.35);
+    --font:system-ui,-apple-system,sans-serif;--r:8px;--rl:12px;
+  }
+  @media(prefers-color-scheme:dark){
+    :root{
+      --bg1:#1c1c1a;--bg2:#242422;--bg3:#2c2c2a;
+      --warn-bg:#412402;--ok-bg:#173404;--err-bg:#501313;--info-bg:#042c53;
+      --tx1:#f0ede8;--tx2:#b4b2a9;--tx3:#888780;
+      --warn:#fac775;--ok:#c0dd97;--err:#f7c1c1;--info:#b5d4f4;
+      --b3:rgba(255,255,255,0.10);--b2:rgba(255,255,255,0.20);--b1:rgba(255,255,255,0.32);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:var(--bg3);color:var(--tx1);min-height:100vh}
+  .app{display:flex;height:100vh;overflow:hidden}
+
+  /* Sidebar */
+  .sidebar{width:220px;flex-shrink:0;background:var(--bg1);border-right:0.5px solid var(--b3);display:flex;flex-direction:column;overflow-y:auto}
+  .logo{padding:20px 16px 12px;border-bottom:0.5px solid var(--b3)}
+  .logo-text{font-size:15px;font-weight:500}
+  .logo-sub{font-size:11px;color:var(--tx3);margin-top:2px}
+  .nav-sec{padding:12px 8px 4px}
+  .nav-lbl{font-size:10px;font-weight:500;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;padding:0 8px 6px}
+  .nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r);cursor:pointer;font-size:13px;color:var(--tx2);border:none;background:none;width:100%;text-align:left;transition:all .15s}
+  .nav-item:hover{background:var(--bg2);color:var(--tx1)}
+  .nav-item.active{background:var(--warn-bg);color:var(--warn)}
+  .nav-item i{font-size:16px;width:16px;flex-shrink:0}
+
+  /* Main */
+  .main{flex:1;overflow-y:auto;padding:24px}
+  .page-title{font-size:18px;font-weight:500;margin-bottom:4px}
+  .page-sub{font-size:13px;color:var(--tx2);margin-bottom:20px}
+
+  /* Cards */
+  .card{background:var(--bg1);border:0.5px solid var(--b3);border-radius:var(--rl);padding:16px 20px;margin-bottom:16px}
+  .card-title{font-size:13px;font-weight:500;margin-bottom:12px;color:var(--tx2)}
+
+  /* Stats */
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .stat{background:var(--bg2);border-radius:var(--r);padding:14px;text-align:center}
+  .stat-val{font-size:22px;font-weight:500;line-height:1}
+  .stat-lbl{font-size:11px;color:var(--tx3);margin-top:4px}
+
+  /* Rows */
+  .row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--b3)}
+  .row:last-child{border-bottom:none}
+  .row-title{font-size:13px;font-weight:500}
+  .row-sub{font-size:12px;color:var(--tx2)}
+
+  /* Badges */
+  .badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
+  .b-amber{background:var(--warn-bg);color:var(--warn)}
+  .b-green{background:var(--ok-bg);color:var(--ok)}
+  .b-red{background:var(--err-bg);color:var(--err)}
+  .b-blue{background:var(--info-bg);color:var(--info)}
+
+  /* Stops */
+  .stops{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+  .stop-name{font-size:12px;font-weight:500}
+  .stop-time{font-size:11px;color:var(--tx3)}
+  .arrow{color:var(--tx3);font-size:14px}
+
+  /* Forms */
+  .form-group{margin-bottom:14px}
+  .form-label{font-size:12px;font-weight:500;color:var(--tx2);margin-bottom:5px;display:block}
+  select,input[type=text],input[type=email],input[type=number]{
+    width:100%;padding:8px 10px;border:0.5px solid var(--b2);border-radius:var(--r);
+    background:var(--bg1);color:var(--tx1);font-size:13px;font-family:inherit}
+  select:focus,input:focus{outline:none;border-color:var(--b1)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--b2);background:var(--bg1);color:var(--tx1);transition:all .15s;font-family:inherit}
+  .btn:hover{background:var(--bg2)}
+  .btn:active{transform:scale(.98)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-primary{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+  .btn-primary:hover{opacity:.9}
+  .btn-danger{background:var(--err-bg);color:var(--err);border-color:transparent}
+  .btn-sm{padding:5px 10px;font-size:12px}
+  .btn-full{width:100%;justify-content:center}
+
+  /* Option cards */
+  .opt-card{background:var(--bg2);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
+  .opt-type{font-size:11px;font-weight:500;color:var(--tx3);margin-bottom:4px}
+  .opt-route{font-size:14px;font-weight:500;margin-bottom:4px}
+  .opt-meta{display:flex;gap:12px;font-size:12px;color:var(--tx2);flex-wrap:wrap}
+
+  /* Toasts */
+  .toasts{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+  .toast{background:var(--bg1);border:0.5px solid var(--b2);border-radius:var(--rl);padding:12px 16px;max-width:300px;animation:slideIn .2s ease}
+  .toast-title{font-size:13px;font-weight:500;margin-bottom:2px}
+  .toast-body{font-size:12px;color:var(--tx2)}
+  .toast-success{border-left:3px solid var(--ok)}
+  .toast-error{border-left:3px solid var(--err)}
+  .toast-info{border-left:3px solid var(--info)}
+  @keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+  /* Misc */
+  .divider{height:0.5px;background:var(--b3);margin:16px 0}
+  .empty{text-align:center;padding:32px;color:var(--tx3);font-size:13px}
+  .flex{display:flex}.gap8{gap:8px}.gap12{gap:12px}.items-center{align-items:center}.mt8{margin-top:8px}.mt16{margin-top:16px}
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--b3);border-top-color:var(--warn);border-radius:50%;animation:spin .6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-block{text-align:center;padding:40px;color:var(--tx3)}
+  .avail-hint{font-size:12px;color:var(--tx2);margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div class="toasts" id="toasts"></div>
+<script>
+const API = 'http://localhost:8080/api';
+
+// ── API helper ────────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || data.message || `HTTP ${res.status}`);
+  return data;
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const S = {
+  page: 'dashboard',
+  data: {},     // fetched from backend per-page
+  form: {},     // current form field values
+  loading: false,
+};
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function toast(title, body, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<div class="toast-title">${title}</div><div class="toast-body">${body}</div>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 4500);
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+async function go(page) {
+  S.page = page; S.form = {}; S.data = {};
+  render();
+  try {
+    S.loading = true;
+    await load(page);
+  } catch (e) {
+    toast('Load error', e.message, 'error');
+  } finally {
+    S.loading = false;
+    render();
+  }
+}
+
+async function load(page) {
+  switch (page) {
+    case 'dashboard':
+      [S.data.trains, S.data.stations, S.data.routes] = await Promise.all([
+        api('GET', '/trains'), api('GET', '/stations'), api('GET', '/routes')
+      ]);
+      break;
+    case 'routes':
+      [S.data.routes, S.data.trains] = await Promise.all([
+        api('GET', '/routes'), api('GET', '/trains')
+      ]);
+      break;
+    case 'find':
+      S.data.stations = await api('GET', '/stations');
+      break;
+    case 'book':
+      [S.data.trains, S.data.routes] = await Promise.all([
+        api('GET', '/trains'), api('GET', '/routes')
+      ]);
+      break;
+    case 'stations':
+      S.data.stations = await api('GET', '/stations');
+      break;
+    case 'mgr-routes':
+      [S.data.routes, S.data.stations] = await Promise.all([
+        api('GET', '/routes'), api('GET', '/stations')
+      ]);
+      break;
+    case 'mgr-trains':
+      [S.data.trains, S.data.routes] = await Promise.all([
+        api('GET', '/trains'), api('GET', '/routes')
+      ]);
+      break;
+    case 'bookings':
+      [S.data.bookings, S.data.trains] = await Promise.all([
+        api('GET', '/bookings'), api('GET', '/trains')
+      ]);
+      break;
+    case 'delays':
+      S.data.trains = await api('GET', '/trains');
+      break;
+  }
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() {
+  document.getElementById('app').innerHTML =
+    `<div class="sidebar">${sidebar()}</div><div class="main">${page()}</div>`;
+  bind();
+}
+
+function sidebar() {
+  const ni = (p, icon, label) =>
+    `<button class="nav-item${S.page === p ? ' active' : ''}" data-page="${p}">
+       <i class="ti ti-${icon}"></i>${label}</button>`;
+  return `
+    <div class="logo"><div class="logo-text"><i class="ti ti-train"></i> TrainTicket</div>
+      <div class="logo-sub">Management System</div></div>
+    <div class="nav-sec"><div class="nav-lbl">Customer</div>
+      ${ni('dashboard','layout-dashboard','Overview')}
+      ${ni('routes','route','Routes & Trains')}
+      ${ni('find','search','Find Options')}
+      ${ni('book','ticket','Book Tickets')}
+    </div>
+    <div class="nav-sec"><div class="nav-lbl">Admin</div>
+      ${ni('stations','map-pin','Stations')}
+      ${ni('mgr-routes','route-off','Manage Routes')}
+      ${ni('mgr-trains','train','Manage Trains')}
+      ${ni('bookings','list','View Bookings')}
+      ${ni('delays','alarm','Delays')}
+    </div>`;
+}
+
+function page() {
+  if (S.loading) return `<div class="loading-block"><div class="spinner" style="width:28px;height:28px;margin:0 auto 12px"></div>Loading…</div>`;
+  switch (S.page) {
+    case 'dashboard':  return pgDashboard();
+    case 'routes':     return pgRoutes();
+    case 'find':       return pgFind();
+    case 'book':       return pgBook();
+    case 'stations':   return pgStations();
+    case 'mgr-routes': return pgMgrRoutes();
+    case 'mgr-trains': return pgMgrTrains();
+    case 'bookings':   return pgBookings();
+    case 'delays':     return pgDelays();
+    default: return '';
+  }
+}
+
+// ── Pages ─────────────────────────────────────────────────────────────────────
+function pgDashboard() {
+  const trains   = S.data.trains   || [];
+  const stations = S.data.stations || [];
+  const routes   = S.data.routes   || [];
+  const bookings = trains.reduce((s, t) => s + t.totalPassengers, 0);
+  const delayed  = trains.filter(t => t.delayed);
+  return `
+    <div class="page-title">Overview</div>
+    <div class="page-sub">System summary at a glance</div>
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-val">${stations.length}</div><div class="stat-lbl">Stations</div></div>
+      <div class="stat"><div class="stat-val">${routes.length}</div><div class="stat-lbl">Routes</div></div>
+      <div class="stat"><div class="stat-val">${trains.length}</div><div class="stat-lbl">Trains</div></div>
+      <div class="stat"><div class="stat-val">${bookings}</div><div class="stat-lbl">Passengers</div></div>
+    </div>
+    ${delayed.length ? `<div class="card" style="border-left:3px solid var(--err)">
+      <div class="flex items-center gap8"><i class="ti ti-alarm" style="color:var(--err)"></i>
+      <span style="font-weight:500;font-size:13px">${delayed.length} train${delayed.length > 1 ? 's are' : ' is'} currently delayed</span></div>
+    </div>` : ''}
+    <div class="card"><div class="card-title">Active trains</div>
+      ${trains.map(t => `
+      <div class="row">
+        <div><div class="row-title">${t.name}</div>
+          <div class="row-sub">${t.routeName || 'No route'} · Capacity: ${t.capacity}</div></div>
+        <div class="flex gap8 items-center">
+          ${t.delayed ? `<span class="badge b-red"><i class="ti ti-alarm"></i>Delayed ${t.delayMinutes}m</span>` : '<span class="badge b-green">On time</span>'}
+          <span class="badge b-blue">${t.totalPassengers} pax</span>
+        </div>
+      </div>`).join('')}
+    </div>`;
+}
+
+function pgRoutes() {
+  const routes = S.data.routes || [];
+  const trains = S.data.trains || [];
+  return `
+    <div class="page-title">Routes & Trains</div>
+    <div class="page-sub">Browse all available routes and schedules</div>
+    ${routes.map(r => `
+    <div class="card">
+      <div class="flex items-center" style="justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:14px;font-weight:500">${r.name}</span>
+        <span class="badge b-amber">${r.stops.length} stops</span>
+      </div>
+      <div class="stops">
+        ${r.stops.map((s, i) => `
+          ${i > 0 ? '<span class="arrow">›</span>' : ''}
+          <span class="stop-name">${s.stationName}</span>
+          <span class="stop-time">${s.time}</span>`).join('')}
+      </div>
+      <div class="divider"></div>
+      <div class="card-title" style="margin-bottom:6px">Assigned trains</div>
+      ${trains.filter(t => t.routeId === r.id).map(t => `
+        <div class="flex items-center" style="justify-content:space-between;font-size:13px;padding:3px 0">
+          <span>${t.name} · ${t.capacity} seats</span>
+          ${t.delayed ? `<span class="badge b-red">Delayed ${t.delayMinutes}m</span>` : '<span class="badge b-green">On time</span>'}
+        </div>`).join('') || '<div style="font-size:12px;color:var(--tx3)">No trains assigned</div>'}
+    </div>`).join('')}`;
+}
+
+function pgFind() {
+  const stations = S.data.stations || [];
+  const results  = S.data.results;
+  const f = S.form;
+  return `
+    <div class="page-title">Find Travel Options</div>
+    <div class="page-sub">Search direct and changeover routes between stations</div>
+    <div class="card">
+      <div class="grid2">
+        <div class="form-group"><label class="form-label">From</label>
+          <select id="f-from">
+            <option value="">Select station</option>
+            ${stations.map(s => `<option value="${s.id}"${f.fromId == s.id ? ' selected' : ''}>${s.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">To</label>
+          <select id="f-to">
+            <option value="">Select station</option>
+            ${stations.map(s => `<option value="${s.id}"${f.toId == s.id ? ' selected' : ''}>${s.name}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-search"><i class="ti ti-search"></i>Search</button>
+    </div>
+    ${results !== undefined ? `
+    <div class="card"><div class="card-title">Results (${results.length})</div>
+      ${results.length === 0
+        ? `<div class="empty"><i class="ti ti-route-off" style="font-size:24px;display:block;margin-bottom:8px"></i>No connection found between these stations</div>`
+        : results.map(o => o.type === 'DIRECT' ? `
+          <div class="opt-card">
+            <div class="opt-type">Direct</div>
+            <div class="opt-route">${o.trainAName}: ${o.fromName} → ${o.toName}</div>
+            <div class="opt-meta">
+              <span><i class="ti ti-clock"></i> ${o.depTime} → ${o.arrTime}</span>
+              <span><i class="ti ti-armchair"></i> ${o.availSeatsA} seats available</span>
+            </div>
+          </div>` : `
+          <div class="opt-card">
+            <div class="opt-type">Changeover at ${o.midName}</div>
+            <div class="opt-route">${o.trainAName} → ${o.trainBName}: ${o.fromName} → ${o.toName}</div>
+            <div class="opt-meta">
+              <span><i class="ti ti-clock"></i> ${o.depTime} → ${o.arrTime}</span>
+              <span>Change at ${o.midName}: arr ${o.midArrTime} / dep ${o.midDepTime}</span>
+              <span><i class="ti ti-armchair"></i> ${o.availSeatsA} / ${o.availSeatsB} seats</span>
+            </div>
+          </div>`).join('')}
+    </div>` : ''}`;
+}
+
+function pgBook() {
+  const trains = S.data.trains || [];
+  const routes = S.data.routes || [];
+  const f = S.form;
+  const selTrain = f.trainId ? trains.find(t => t.id == f.trainId) : null;
+  const selRoute = selTrain ? routes.find(r => r.id === selTrain.routeId) : null;
+  const avail = S.data.avail;
+  return `
+    <div class="page-title">Book Tickets</div>
+    <div class="page-sub">Reserve seats on a train</div>
+    <div class="card">
+      <div class="form-group"><label class="form-label">Train</label>
+        <select id="b-train">
+          <option value="">Select train</option>
+          ${trains.map(t => `<option value="${t.id}"${f.trainId == t.id ? ' selected' : ''}>${t.name} — ${t.routeName || 'No route'}</option>`).join('')}
+        </select>
+      </div>
+      ${selRoute ? `
+      <div class="grid2">
+        <div class="form-group"><label class="form-label">Boarding station</label>
+          <select id="b-from">
+            <option value="">Select</option>
+            ${selRoute.stops.map(s => `<option value="${s.stationId}"${f.fromId == s.stationId ? ' selected' : ''}>${s.stationName} (${s.time})</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Alighting station</label>
+          <select id="b-to">
+            <option value="">Select</option>
+            ${selRoute.stops.map(s => `<option value="${s.stationId}"${f.toId == s.stationId ? ' selected' : ''}>${s.stationName} (${s.time})</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      ${avail !== undefined ? `<div class="avail-hint"><i class="ti ti-armchair"></i> Available seats on this segment: <strong>${avail}</strong></div>` : ''}
+      <div class="grid2">
+        <div class="form-group"><label class="form-label">Passenger name</label>
+          <input type="text" id="b-name" placeholder="Full name" value="${f.name || ''}">
+        </div>
+        <div class="form-group"><label class="form-label">Email</label>
+          <input type="email" id="b-email" placeholder="email@example.com" value="${f.email || ''}">
+        </div>
+      </div>
+      <div class="form-group" style="max-width:160px"><label class="form-label">Tickets</label>
+        <input type="number" id="b-tickets" min="1" max="99" value="${f.tickets || 1}">
+      </div>
+      <button class="btn btn-primary" id="btn-book"><i class="ti ti-ticket"></i>Confirm Booking</button>
+      ` : ''}
+    </div>`;
+}
+
+function pgStations() {
+  const stations = S.data.stations || [];
+  return `
+    <div class="page-title">Manage Stations</div>
+    <div class="page-sub">Add or remove stations</div>
+    <div class="card"><div class="card-title">Add station</div>
+      <div class="flex gap8">
+        <input type="text" id="s-name" placeholder="Station name" style="flex:1" value="${S.form.sName || ''}">
+        <button class="btn btn-primary" id="btn-add-station"><i class="ti ti-plus"></i>Add</button>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">All stations (${stations.length})</div>
+      ${stations.map(s => `
+      <div class="row">
+        <div><span style="font-size:11px;color:var(--tx3)">ID ${s.id}</span><br>
+          <span style="font-size:13px;font-weight:500">${s.name}</span></div>
+        <button class="btn btn-sm btn-danger del-station" data-id="${s.id}"><i class="ti ti-trash"></i>Remove</button>
+      </div>`).join('')}
+    </div>`;
+}
+
+function pgMgrRoutes() {
+  const routes   = S.data.routes   || [];
+  const stations = S.data.stations || [];
+  const f = S.form;
+  const draft = f.stops || [];
+  return `
+    <div class="page-title">Manage Routes</div>
+    <div class="page-sub">Create or remove routes</div>
+    <div class="card"><div class="card-title">Add route</div>
+      <div class="form-group"><label class="form-label">Route name</label>
+        <input type="text" id="r-name" placeholder="e.g. Mountain Express" value="${f.rName || ''}">
+      </div>
+      <div class="card-title">Stops (in order)</div>
+      ${draft.map((stop, i) => `
+      <div class="flex items-center gap8" style="margin-bottom:6px;font-size:13px">
+        <span style="width:20px;color:var(--tx3)">${i+1}.</span>
+        <span style="flex:1">${stations.find(s => s.id == stop.stationId)?.name || '?'}</span>
+        <input type="text" placeholder="HH:MM" value="${stop.time}" id="rt-${i}" style="width:80px">
+        <button class="btn btn-sm del-stop" data-idx="${i}"><i class="ti ti-x"></i></button>
+      </div>`).join('')}
+      <div class="flex gap8 mt8">
+        <select id="r-add-st" style="flex:1">
+          <option value="">Add station…</option>
+          ${stations.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+        </select>
+        <button class="btn" id="btn-add-stop"><i class="ti ti-plus"></i>Add</button>
+      </div>
+      <div class="mt16">
+        <button class="btn btn-primary" id="btn-save-route"><i class="ti ti-device-floppy"></i>Save Route</button>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">Existing routes</div>
+      ${routes.map(r => `
+      <div class="row">
+        <div><div class="row-title">${r.name}</div>
+          <div class="row-sub">${r.stops.map(s => s.stationName).join(' → ')}</div></div>
+        <button class="btn btn-sm btn-danger del-route" data-id="${r.id}"><i class="ti ti-trash"></i>Remove</button>
+      </div>`).join('')}
+    </div>`;
+}
+
+function pgMgrTrains() {
+  const trains = S.data.trains || [];
+  const routes = S.data.routes || [];
+  const f = S.form;
+  return `
+    <div class="page-title">Manage Trains</div>
+    <div class="page-sub">Add, modify or remove trains</div>
+    <div class="card"><div class="card-title">Add train</div>
+      <div class="grid2">
+        <div class="form-group"><label class="form-label">Train name</label>
+          <input type="text" id="t-name" placeholder="e.g. IC 700" value="${f.tName || ''}">
+        </div>
+        <div class="form-group"><label class="form-label">Capacity</label>
+          <input type="number" id="t-cap" placeholder="e.g. 120" value="${f.tCap || ''}">
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Route</label>
+        <select id="t-route">
+          <option value="">No route</option>
+          ${routes.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-primary" id="btn-add-train"><i class="ti ti-plus"></i>Add Train</button>
+    </div>
+    <div class="card"><div class="card-title">Existing trains</div>
+      ${trains.map(t => `
+      <div class="row">
+        <div><div class="row-title">${t.name}</div>
+          <div class="row-sub">${t.routeName || 'No route'} · ${t.capacity} seats</div></div>
+        <div class="flex gap8 items-center">
+          ${t.delayed ? `<span class="badge b-red">Delayed</span>` : ''}
+          <button class="btn btn-sm btn-danger del-train" data-id="${t.id}"><i class="ti ti-trash"></i>Remove</button>
+        </div>
+      </div>`).join('')}
+    </div>`;
+}
+
+function pgBookings() {
+  const allBookings = S.data.bookings || [];
+  const trains      = S.data.trains   || [];
+  const f = S.form;
+  const filtered = f.trainFilter
+    ? allBookings.filter(b => b.trainId == f.trainFilter)
+    : allBookings;
+  return `
+    <div class="page-title">View Bookings</div>
+    <div class="page-sub">All passenger bookings</div>
+    <div class="card">
+      <div class="form-group"><label class="form-label">Filter by train</label>
+        <select id="bk-filter">
+          <option value="">All trains</option>
+          ${trains.map(t => `<option value="${t.id}"${f.trainFilter == t.id ? ' selected' : ''}>${t.name}</option>`).join('')}
+        </select>
+      </div>
+      ${filtered.length === 0
+        ? '<div class="empty">No bookings found</div>'
+        : filtered.map(b => `
+        <div class="row" style="flex-direction:column;align-items:flex-start;gap:4px">
+          <div class="flex items-center" style="justify-content:space-between;width:100%">
+            <span style="font-weight:500;font-size:13px">#${b.id} ${b.passengerName}</span>
+            <span class="badge b-amber">${b.tickets} ticket${b.tickets > 1 ? 's' : ''}</span>
+          </div>
+          <div style="font-size:12px;color:var(--tx2)">${b.trainName} · ${b.fromStationName} → ${b.toStationName}</div>
+          <div style="font-size:12px;color:var(--info)">${b.email} · ${b.bookingDate}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function pgDelays() {
+  const trains = S.data.trains || [];
+  return `
+    <div class="page-title">Delay Management</div>
+    <div class="page-sub">Mark trains delayed — all passengers are emailed automatically</div>
+    ${trains.map(t => `
+    <div class="card">
+      <div class="flex items-center" style="justify-content:space-between;margin-bottom:12px">
+        <div><div style="font-size:14px;font-weight:500">${t.name}</div>
+          <div style="font-size:12px;color:var(--tx2)">${t.routeName || 'No route'} · ${t.totalPassengers} passenger(s)</div></div>
+        ${t.delayed
+          ? `<span class="badge b-red"><i class="ti ti-alarm"></i>Delayed ${t.delayMinutes} min</span>`
+          : '<span class="badge b-green">On time</span>'}
+      </div>
+      ${t.delayed
+        ? `<button class="btn btn-full" id="clear-delay-${t.id}"><i class="ti ti-circle-check"></i>Clear Delay</button>`
+        : `<div class="flex gap8">
+            <input type="number" id="delay-min-${t.id}" placeholder="Minutes" min="1" style="flex:1">
+            <button class="btn btn-danger" id="set-delay-${t.id}"><i class="ti ti-alarm"></i>Set Delay</button>
+           </div>`}
+    </div>`).join('')}`;
+}
+
+// ── Event binding ─────────────────────────────────────────────────────────────
+function bind() {
+  const q  = id => document.getElementById(id);
+  const on = (id, fn) => { const el = q(id); if (el) el.addEventListener('click', fn); };
+  const ons = (id, fn) => { const el = q(id); if (el) el.addEventListener('change', fn); };
+  const oninput = (id, fn) => { const el = q(id); if (el) el.addEventListener('input', fn); };
+
+  // Sidebar nav
+  document.querySelectorAll('[data-page]').forEach(el =>
+    el.addEventListener('click', () => go(el.dataset.page)));
+
+  // ── Find ──
+  ons('f-from', e => { S.form.fromId = e.target.value; });
+  ons('f-to',   e => { S.form.toId   = e.target.value; });
+  on('btn-search', async () => {
+    const { fromId, toId } = S.form;
+    if (!fromId || !toId) { toast('Missing fields', 'Select both stations.', 'error'); return; }
+    if (fromId === toId)  { toast('Invalid', 'Stations must be different.', 'error'); return; }
+    try {
+      S.data.results = await api('GET', `/trains/travel-options?fromId=${fromId}&toId=${toId}`);
+      render();
+    } catch (e) { toast('Search error', e.message, 'error'); }
+  });
+
+  // ── Book ──
+  ons('b-train', async e => {
+    S.form.trainId = e.target.value;
+    S.form.fromId = ''; S.form.toId = ''; S.data.avail = undefined;
+    render();
+  });
+  ons('b-from', async e => {
+    S.form.fromId = e.target.value;
+    await refreshAvail();
+  });
+  ons('b-to', async e => {
+    S.form.toId = e.target.value;
+    await refreshAvail();
+  });
+  oninput('b-name',    e => { S.form.name    = e.target.value; });
+  oninput('b-email',   e => { S.form.email   = e.target.value; });
+  oninput('b-tickets', e => { S.form.tickets = e.target.value; });
+  on('btn-book', async () => {
+    const f = S.form;
+    if (!f.trainId || !f.fromId || !f.toId) { toast('Missing', 'Select train and stations.', 'error'); return; }
+    if (!f.name?.trim())  { toast('Missing', 'Enter passenger name.', 'error'); return; }
+    if (!f.email?.trim()) { toast('Missing', 'Enter email address.', 'error'); return; }
+    try {
+      const b = await api('POST', '/bookings', {
+        trainId: parseInt(f.trainId), fromStationId: parseInt(f.fromId),
+        toStationId: parseInt(f.toId), passengerName: f.name.trim(),
+        email: f.email.trim(), tickets: parseInt(f.tickets) || 1
+      });
+      toast('Booking confirmed!', `#${b.id} · ${b.passengerName} · Confirmation sent to ${b.email}`, 'success');
+      S.form = {};
+      await load('book');
+      render();
+    } catch (e) { toast('Booking failed', e.message, 'error'); }
+  });
+
+  // ── Stations ──
+  oninput('s-name', e => { S.form.sName = e.target.value; });
+  on('btn-add-station', async () => {
+    const name = S.form.sName?.trim();
+    if (!name) { toast('Error', 'Station name required.', 'error'); return; }
+    try {
+      await api('POST', '/stations', { name });
+      toast('Station added', name, 'success');
+      S.form.sName = '';
+      await load('stations'); render();
+    } catch (e) { toast('Error', e.message, 'error'); }
+  });
+  document.querySelectorAll('.del-station').forEach(btn =>
+    btn.addEventListener('click', async () => {
+      try {
+        await api('DELETE', `/stations/${btn.dataset.id}`);
+        toast('Removed', 'Station deleted.', 'info');
+        await load('stations'); render();
+      } catch (e) { toast('Error', e.message, 'error'); }
+    }));
+
+  // ── Manage Routes ──
+  oninput('r-name', e => { S.form.rName = e.target.value; });
+  on('btn-add-stop', () => {
+    const sid = parseInt(q('r-add-st')?.value);
+    if (!sid) return;
+    if (!S.form.stops) S.form.stops = [];
+    S.form.stops.push({ stationId: sid, time: '' });
+    render();
+  });
+  document.querySelectorAll('.del-stop').forEach(btn =>
+    btn.addEventListener('click', () => {
+      S.form.stops.splice(parseInt(btn.dataset.idx), 1);
+      render();
+    }));
+  on('btn-save-route', async () => {
+    const name = q('r-name')?.value.trim();
+    if (!name) { toast('Error', 'Route name required.', 'error'); return; }
+    const stops = (S.form.stops || []).map((s, i) => ({
+      stationId: s.stationId,
+      time: q(`rt-${i}`)?.value || ''
+    }));
+    if (stops.length < 2) { toast('Error', 'At least 2 stops required.', 'error'); return; }
+    try {
+      await api('POST', '/routes', { name, stops });
+      toast('Route saved', name, 'success');
+      S.form = {};
+      await load('mgr-routes'); render();
+    } catch (e) { toast('Error', e.message, 'error'); }
+  });
+  document.querySelectorAll('.del-route').forEach(btn =>
+    btn.addEventListener('click', async () => {
+      try {
+        await api('DELETE', `/routes/${btn.dataset.id}`);
+        toast('Removed', 'Route deleted.', 'info');
+        await load('mgr-routes'); render();
+      } catch (e) { toast('Error', e.message, 'error'); }
+    }));
+
+  // ── Manage Trains ──
+  oninput('t-name', e => { S.form.tName = e.target.value; });
+  oninput('t-cap',  e => { S.form.tCap  = e.target.value; });
+  ons('t-route',    e => { S.form.tRoute = e.target.value; });
+  on('btn-add-train', async () => {
+    const name = S.form.tName?.trim();
+    const cap  = parseInt(S.form.tCap);
+    if (!name)   { toast('Error', 'Train name required.', 'error'); return; }
+    if (!cap || cap < 1) { toast('Error', 'Valid capacity required.', 'error'); return; }
+    try {
+      await api('POST', '/trains', {
+        name, capacity: cap,
+        routeId: S.form.tRoute ? parseInt(S.form.tRoute) : null
+      });
+      toast('Train added', name, 'success');
+      S.form = {};
+      await load('mgr-trains'); render();
+    } catch (e) { toast('Error', e.message, 'error'); }
+  });
+  document.querySelectorAll('.del-train').forEach(btn =>
+    btn.addEventListener('click', async () => {
+      try {
+        await api('DELETE', `/trains/${btn.dataset.id}`);
+        toast('Removed', 'Train deleted.', 'info');
+        await load('mgr-trains'); render();
+      } catch (e) { toast('Error', e.message, 'error'); }
+    }));
+
+  // ── Bookings filter ──
+  ons('bk-filter', e => { S.form.trainFilter = e.target.value; render(); });
+
+  // ── Delays ──
+  (S.data.trains || []).forEach(t => {
+    on(`set-delay-${t.id}`, async () => {
+      const mins = parseInt(document.getElementById(`delay-min-${t.id}`)?.value);
+      if (!mins || mins < 1) { toast('Error', 'Enter delay in minutes.', 'error'); return; }
+      try {
+        await api('POST', `/trains/${t.id}/delay`, { minutes: mins });
+        toast(`Delay set — ${t.name}`, `${t.totalPassengers} passenger(s) notified by email`, 'info');
+        await load('delays'); render();
+      } catch (e) { toast('Error', e.message, 'error'); }
+    });
+    on(`clear-delay-${t.id}`, async () => {
+      try {
+        await api('DELETE', `/trains/${t.id}/delay`);
+        toast('Delay cleared', t.name, 'success');
+        await load('delays'); render();
+      } catch (e) { toast('Error', e.message, 'error'); }
+    });
+  });
+}
+
+// ── Availability helper ───────────────────────────────────────────────────────
+async function refreshAvail() {
+  const { trainId, fromId, toId } = S.form;
+  if (!trainId || !fromId || !toId || fromId === toId) {
+    S.data.avail = undefined; render(); return;
+  }
+  try {
+    const opts = await api('GET', `/trains/travel-options?fromId=${fromId}&toId=${toId}`);
+    const match = opts.find(o => o.type === 'DIRECT' && o.trainAId == trainId);
+    S.data.avail = match ? match.availSeatsA : undefined;
+  } catch (_) { S.data.avail = undefined; }
+  render();
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+go('dashboard');
+</script>
+</body>
+</html>
