@@ -101,24 +101,24 @@ public class TrainController {
 
     // ── GET travel options ────────────────────────────────────────────────────
     @GetMapping("/travel-options")
-    public ResponseEntity<?> travelOptions(
-            @RequestParam int fromId,
-            @RequestParam int toId) {
-
+    public ResponseEntity<?> travelOptions(@RequestParam int fromId, @RequestParam int toId) {
         Stations from = ts.findStationById(fromId);
         Stations to   = ts.findStationById(toId);
-        if (from == null || to == null)
-            return ResponseEntity.badRequest().body(Map.of("error", "Station not found."));
 
+        if (from == null || to == null) return ResponseEntity.badRequest().build();
 
+        List<TravelOptionResponse> responses = new ArrayList<>();
 
-        // Direct
+        // Map Direct Paths
+        ts.findDirectPaths(from, to).forEach(dp ->
+                responses.add(toDirectResponse(dp)));
 
-        List<String> results = ts.findTravelOptions(from, to);
+        // Map Changeover Paths
+        ts.findChangeoverPaths(from, to).forEach(co ->
+                responses.add(toChangeoverResponse(co)));
 
-        return ResponseEntity.ok(results);
+        return ResponseEntity.ok(responses);
     }
-
     // ── Mapping helpers ───────────────────────────────────────────────────────
     private TrainResponse toResponse(Train t) {
         Route r = t.getRouteOfTrain();

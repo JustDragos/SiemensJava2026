@@ -1,5 +1,5 @@
 # SiemensJava2026
-
+## This is the README.md for the first problem, there should be another one for the second problem, another .md file
 
 # Solution:
 I have developed a Spring Boot backend that handles the core business logic. I integrated Mailtrap for email functionality and created HTML templates for the frontend. Following the Model-View-Controller (MVC) pattern, the Model represents the data, the View displays it, and the Controller manages the interaction between the two. I also use DTOs for JSON communication. To keep the controllers lean, I implemented a service layer that handles all data processing and business rules.
@@ -18,6 +18,10 @@ Used Java version 23
 ## Routes & Trains
 
 ![Routes & Trains](photos/image-1.png)
+
+## Find Tracks
+
+![Alternative or Direct Tracks](photos/image-13.png)
 
 ## Book Tickets
 
